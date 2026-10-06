@@ -399,15 +399,16 @@ class LesionAggregator(nn.Module):
         x = x + self.pos_z_embed(pos_ids)[None]
 
         # Cross-Attention: Q searches in the slice tokens (K, V)
+        q = self.queries.expand(B, -1, -1)
         attn_out, _ = self.cross_attn(
-            query=self.ln_q(self.queries),
+            query=self.ln_q(q),
             key=self.ln_kv(x),
             value=self.ln_kv(x)
         )
-        x_q = self.queries + attn_out
+        x_q = q + attn_out
         x_q = x_q + self.mlp(self.ln_post(x_q))
 
-        return x_q  # [1, 2, d]
+        return x_q  # [B, 2, D]
 
 class PatchAggregator(nn.Module):
     def __init__(
@@ -604,9 +605,62 @@ class FARO(nn.Module):
         return x
 
     def forward(self, x):
-        if not isinstance(x, torch.Tensor):
+        if isinstance(x, np.ndarray):
             x = self.to_tensor(x)
-        return self.model(x)
+        if isinstance(x, torch.Tensor):
+            return self.model(x)
+
+        # List of volumes [S_i, H, W]
+        tensors = [self.to_tensor(v) for v in x]      # each [1, 1, S_i, H, W]
+
+        # All same S -> one single batch
+        if len({t.shape[2] for t in tensors}) == 1:
+            return self.model(torch.cat(tensors, dim=0))   # [N, F]
+
+        # Mixed S -> one batch per distinct S, original order restored
+        outputs = [None] * len(tensors)
+        groups = {}
+        for i, t in enumerate(tensors):
+            groups.setdefault(t.shape[2], []).append(i)
+        for idxs in groups.values():
+            out = self.model(torch.cat([tensors[i] for i in idxs], dim=0))
+            for j, i in enumerate(idxs):
+                outputs[i] = out[j]
+        return torch.stack(outputs)
+
+
+def check_batch_consistency(model, volumes, cos_thresh=0.99):
+    """Checks that batched inference matches one-volume-at-a-time
+    inference."""
+    print("\n--- Batch consistency check ---")
+    print("Slices per volume:", [v.shape[0] for v in volumes])
+
+    # Reference: one volume per call
+    single = torch.cat([model(v).cpu() for v in volumes], dim=0)
+
+    # Whole list in one call
+    batched = model(volumes).cpu()
+    assert batched.shape == single.shape, \
+        f"Shape mismatch: {batched.shape} vs {single.shape}"
+
+    cos = F.cosine_similarity(single, batched, dim=1)
+    print("max abs diff :", (single - batched).abs().max().item())
+    print("min cos sim  :", cos.min().item())
+    assert cos.min() > cos_thresh, f"Batched != single (cos={cos.min():.4f})"
+
+    # Order check: reversed input must give reversed output
+    rev = model(volumes[::-1]).cpu()
+    cos_rev = F.cosine_similarity(batched.flip(0), rev, dim=1)
+    print("min cos sim (reversed order):", cos_rev.min().item())
+    assert cos_rev.min() > cos_thresh, "Output order is not preserved"
+
+    # Volumes should be distinguishable from each other (no batch mixing)
+    if len(volumes) > 1:
+        cross = F.cosine_similarity(batched[0:1], batched[1:], dim=1)
+        assert cross.max() < cos.min(), \
+            "Different volumes look as similar as the same volume; check for batch mixing"
+
+    print("OK: batched inference is consistent")
 
 
 
@@ -615,6 +669,8 @@ if __name__ == "__main__":
     from sklearn.manifold import TSNE
     import matplotlib.pyplot as plt
 
+    NUM_VOLUMES = 3  # volumes processed per forward call
+
     args = ModelArgs()
     model = FARO(args)
     path = Path('./_datasets/Classification_3D/OCTAVE/test')
@@ -622,11 +678,13 @@ if __name__ == "__main__":
     targets = []
     for idx, class_name in enumerate(sorted(path.iterdir())):
         print(f"Processing class: {class_name.name}")
-        for file in tqdm(sorted(class_name.iterdir())):
-            volume = np.load(file)['vol']
-            out = model(volume)
+        files = sorted(class_name.iterdir())
+        for start in tqdm(range(0, len(files), NUM_VOLUMES)):
+            chunk = files[start:start + NUM_VOLUMES]
+            volumes = [np.load(f)['vol'] for f in chunk]
+            out = model(volumes)                       # [len(chunk), F]
             features = torch.cat((features, out.cpu()), dim=0)
-            targets.append(idx)
+            targets.extend([idx] * len(chunk))
     print("Features shape:", features.shape)
     targets = torch.tensor(targets)
     print("Targets shape:", targets.shape)
@@ -641,3 +699,15 @@ if __name__ == "__main__":
     plt.xlabel('t-SNE Component 1')
     plt.ylabel('t-SNE Component 2')
     plt.show()
+
+    # --- CONSISTENCY CHECK ---
+    test_files = [f for c in sorted(path.iterdir()) for f in sorted(c.iterdir())][:4]
+    test_volumes = [np.load(f)['vol'] for f in test_files]
+    check_batch_consistency(model, test_volumes)
+    mixed = [
+        test_volumes[0],
+        test_volumes[1][:15],
+        test_volumes[2],
+        test_volumes[3][:10],
+    ]
+    check_batch_consistency(model, mixed)
