@@ -1,0 +1,38 @@
+# Exclude specific directories
+- output/
+- venv/
+- out/
+- session
+- data_processing/
+- hf/
+- docs/
+- _example_images/
+- _cfgs/
+- Python-3.10.16/
+- venv12/
+- visualization/
+- runner
+- LICENSE
+- CITATION.bib
+- requirements.txt
+- mirage_hf_full.py
+- prepare_env.py
+- filter.txt
+- _datasets/
+
+# Exclude dunder-style items (e.g., __pycache__)
+- __*/
+
+# But force including some
++ __weights/
+
+# Exclude all hidden files/folders (starting with .)
+- .*
+
+# Exclude by file extension
+- *.md
+- *.log
+
+# Exclude specific utility scripts/paths
+- run_local.sh
+- sync

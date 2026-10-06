@@ -1,0 +1,35 @@
+$ python -m run_posttraining evaluate_model 
+  --predictions: ["/mnt/Data/SSHFS/msc_server/MIRAGE_future/__posttraining/val/nv05/r-meanpool_lp-max_avg_nq-16_as-32_sk-True_fw-True__010.json", "/mnt/Data/SSHFS/msc_server/MIRAGE_future/__posttraining/val/nv05/r-xattn_v2_lp-xattn_v2_nq-16_as-32_sk-True_fw-True__010.json"]
+
+Number of runners: 1
+
+$ python -m run_posttraining evaluate_model   # 2 combinations
+  --predictions /mnt/Data/SSHFS/msc_server/MIRAGE_future/__posttraining/val/nv05/r-meanpool_lp-max_avg_nq-16_as-32_sk-True_fw-True__010.json
+  --predictions /mnt/Data/SSHFS/msc_server/MIRAGE_future/__posttraining/val/nv05/r-xattn_v2_lp-xattn_v2_nq-16_as-32_sk-True_fw-True__010.json
+
+
+--------------------------------------------------------------------------------
+$ python -m run_posttraining evaluate_model --predictions /mnt/Data/SSHFS/msc_server/MIRAGE_future/__posttraining/val/nv05/r-meanpool_lp-max_avg_nq-16_as-32_sk-True_fw-True__010.json 
+
+Starting EVALUATION...
+
+Samples: 1658 total | 1656 evaluated | 2 both-empty (excluded) | 52 one-empty
+
+Macro  — Precision: 0.6927 | Recall: 0.6460 | F1: 0.6494±0.3762
+Micro  — Precision: 0.6729 | Recall: 0.5938 | F1: 0.6309
+
+NLP metrics — BLEU-1: 0.2011 | BLEU-4: 0.0340 | ROUGE-L: 0.5174
+exited with: exit status: 0
+--------------------------------------------------------------------------------
+$ python -m run_posttraining evaluate_model --predictions /mnt/Data/SSHFS/msc_server/MIRAGE_future/__posttraining/val/nv05/r-xattn_v2_lp-xattn_v2_nq-16_as-32_sk-True_fw-True__010.json 
+Starting EVALUATION...
+
+Samples: 1658 total | 1653 evaluated | 5 both-empty (excluded) | 45 one-empty
+
+Macro  — Precision: 0.7072 | Recall: 0.6619 | F1: 0.6649±0.3728
+Micro  — Precision: 0.6817 | Recall: 0.6084 | F1: 0.6430
+
+NLP metrics — BLEU-1: 0.2011 | BLEU-4: 0.0402 | ROUGE-L: 0.5265
+exited with: exit status: 0
+
+2 commands run by 1 runners.

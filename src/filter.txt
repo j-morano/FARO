@@ -1,0 +1,24 @@
+# Exclude specific directories
+- output/
+- *venv/
+- out/
+- session
+- data_processing/
+- eval/_datasets/
+- eval/hf/
+- eval/inference
+- pruebas/
+
+# Exclude dunder-style items (e.g., __pycache__)
+- __*/
+
+# Exclude all hidden files/folders (starting with .)
+- .*
+
+# Exclude by file extension
+- *.md
+- *.log
+
+# Exclude specific utility scripts/paths
+- run_local.sh
+- sync

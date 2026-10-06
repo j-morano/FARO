@@ -30,9 +30,9 @@ For more details, please inspect the script itself, which provides a usage examp
 
 This repository is still under development, and updates will be made in the near future. The following features are planned, in order of priority:
 
-- [ ] Inference code for 2D.
-- [ ] Benchmark datasets.
-- [ ] Evaluation code.
-- [ ] Training code.
-- [ ] Plotting utilities.
+- [x] Evaluation code.
+- [x] Training code.
+- [x] Plotting utilities.
 - [x] Inference code for 3D and weights.
+- [ ] Processed benchmark datasets.
+- [ ] Inference code for 2D.
