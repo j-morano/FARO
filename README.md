@@ -26,6 +26,11 @@ The script `infer.py` provides the code for running inference with FARO for whol
 For more details, please inspect the script itself, which provides a usage example in the main.
 
 
+## Training and evaluation
+
+Training and evaluation code can be found under `src/` and `src/eval/`, respectively. Please check the README files in those directories for more details.
+
+
 ## TODO
 
 This repository is still under development, and updates will be made in the near future. The following features are planned, in order of priority:
