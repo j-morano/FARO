@@ -36,3 +36,23 @@ This repository is still under development, and updates will be made in the near
 - [x] Inference code for 3D and weights.
 - [ ] Processed benchmark datasets.
 - [ ] Inference code for 2D.
+
+## Acknowledgements
+FARO code is mainly based on MIRAGE, along with timm, DeiT, DINO, MoCo-v3, BEiT, MAE-priv, MAE, mmsegmentation, MONAI, and RETFound. We thank the authors for making their code available. In addition, the code for UrFound, VisionFM, OCTCube and iBOT was used in our experiments for model comparisons.
+
+- https://github.com/j-morano/MIRAGE
+- https://github.com/EPFL-VILAB/MultiMAE
+- https://github.com/rwightman/pytorch-image-models/tree/master/timm
+- https://github.com/facebookresearch/deit
+- https://github.com/facebookresearch/dino
+- https://github.com/facebookresearch/moco-v3
+- https://github.com/microsoft/unilm/tree/master/beit
+- https://github.com/BUPT-PRIV/MAE-priv
+- https://github.com/facebookresearch/mae
+- https://github.com/open-mmlab/mmsegmentation
+- https://github.com/Project-MONAI/MONAI
+- https://github.com/rmaphoh/RETFound_MAE
+- https://github.com/yukkai/UrFound
+- https://github.com/bytedance/ibot
+- https://github.com/ABILab-CUHK/VisionFM
+- https://github.com/ZucksLiu/OCTCubeM
