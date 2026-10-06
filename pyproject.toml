@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "FARO"
+version = "0.1.0"
+description = "FARO OCT Foundation model"
+requires-python = ">=3.12"
+dependencies = [
+    "einops==0.8.2",
+    "numpy==2.4.3",
+    "torch-c-dlpack-ext==0.1.5",
+    "scikit-learn==1.9.1",
+    "tqdm==4.70.1",
+    "matplotlib==3.11.2",
+    "torch==2.11.0+cu126",
+    "torchvision==0.26.0+cu126",
+]
+
+[tool.uv]
+# PyTorch index is explicit—only used for torch* packages
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+# Assign torch packages to the PyTorch index
+[tool.uv.sources]
+torch = { index = "pytorch-cu126" }
+torchvision = { index = "pytorch-cu126" }

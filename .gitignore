@@ -1,0 +1,4 @@
+__*/
+*.egg-info/
+_weights/*.pth
+_datasets/*
